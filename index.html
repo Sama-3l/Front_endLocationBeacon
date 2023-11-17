@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Get GPS Location</title>
+</head>
+<body>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(function(position) {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+
+        console.log('Latitude:', latitude);
+        console.log('Longitude:', longitude);
+
+        // Send the coordinates to the server
+        fetch('https://locationbeacon-production.up.railway.app/update-location', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ latitude, longitude }),
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to send coordinates to the server');
+          }
+          console.log('Coordinates sent successfully');
+        })
+        .catch(error => {
+          console.error('Error:', error.message);
+        });
+      }, function(error) {
+        console.error('Error getting location:', error.message);
+      });
+    } else {
+      console.error('Geolocation is not supported by your browser');
+    }
+  });
+</script>
+
+</body>
+</html>
